@@ -1,27 +1,111 @@
 # Stufe 7 — Ausbau (optional)
 
 **Ziel:** Das Projekt komfortabler und vorzeigbar machen.
-**Was du lernst:** I²C-Display, ADC (Poti als Frequenzregler), ESP32-WLAN, einfache Web-UI.
-**Voraussetzung:** Stufe 6
+**Was du lernst:** I²C-Display (SSD1306), ADC am ESP32, Digital-Poti via SPI, Web-Server-Grundlagen.
+**Voraussetzung:** [Stufe 6](06-esp32-steuert.md)
 
-## Ideen (in steigender Schwierigkeit)
+Diese Stufe ist optional und modular — jeder der vier Ausbauten ist für sich allein umsetzbar.
 
-### Ausbau A — Status-OLED
+## Ausbau A — Status-OLED (SSD1306)
 
-_TODO:_ 0,96" OLED (SSD1306) via I²C. Anzeige: aktueller Modus, aktuelle Frequenz (aus Stufe 5), Step-Zähler.
+Ein 0,96"-OLED über I²C zeigt Modus, aktuelle Frequenz (aus Stufe 5) und den Step-Zähler. Sehr schönes Ergebnis mit minimalem Hardware-Aufwand.
 
-### Ausbau B — Frequenz-Sollwert per Poti
+### Schaltung
 
-_TODO:_ Poti am ADC des ESP32 → ESP32 kennt das Verhältnis Poti-Stellung ↔ Zielfrequenz. Anzeige von Soll- und Ist-Frequenz.
+| OLED | ESP32 |
+|------|-------|
+| VCC | 3V3 |
+| GND | GND |
+| SCL | GPIO 22 (I²C-Clock, Default) |
+| SDA | GPIO 21 (I²C-Data, Default) |
 
-### Ausbau C — Frequenz softwareseitig einstellen
+> **Kollision beachten:** GPIO 21 wird im Stufe-6-Sketch für `LED_SINGLE` genutzt. Wenn OLED + Mode-Controller auf demselben ESP32 laufen, die Single-LED auf einen freien Pin (z. B. **GPIO 23**) umziehen.
 
-_TODO:_ Digital-Potentiometer (z. B. MCP41010) ersetzt R2 im 555 A. ESP32 setzt den Wert per SPI → echte Software-steuerbare Frequenz. Alternative: komplett auf ESP32-LEDC/PWM wechseln und den 555 „ablösen" — bewusst didaktischer Endpunkt.
+### Bibliothek
 
-### Ausbau D — Web-UI
+Arduino → Werkzeuge → Bibliotheksverwalter → „Adafruit SSD1306" installieren. Zieht „Adafruit GFX" automatisch mit.
 
-_TODO:_ ESP32 als WLAN-Access-Point oder im lokalen WLAN, kleine HTML-Seite mit Mode-Buttons und Frequenz-Slider.
+### Code
+
+Grundgerüst mit Frequenzmessung und Platzhalter-Modus: [`code/stage07_oled/stage07_oled.ino`](../code/stage07_oled/stage07_oled.ino). Für den vollen Funktionsumfang den Stufe-6-Code dort einbauen und `modeText` / `stepCount` aus der State-Machine übernehmen.
+
+## Ausbau B — Frequenz-Sollwert per Poti
+
+Ein 10-kΩ-Poti an einem ESP32-ADC-Pin (z. B. **GPIO 35**, nur-Eingang) gibt dir einen „Sollwert" von 0 … 4095 (12-Bit-ADC). Die Ist-Frequenz kommt aus Stufe 5. Auf dem Display: `Soll: 3,0 Hz / Ist: 1,4 Hz`.
+
+Der Soll-Wert ist in dieser Stufe rein **informativ** — er beeinflusst den 555 (noch) nicht. Das ist der Job von Ausbau C.
+
+### ADC-Fallstricke
+
+- ADC2 wird von WiFi mitbenutzt — bei aktivem WLAN **ADC1-Pins** verwenden (GPIO 32–39).
+- ADC-Linearität des ESP32 ist mäßig; für Frequenzanzeige völlig ok, für Messtechnik nicht.
+
+## Ausbau C — Frequenz wirklich softwareseitig einstellen
+
+Zwei Wege:
+
+### C.1 Digital-Poti als R2
+
+Ein **MCP41010** (10 kΩ, 8 Bit via SPI) ersetzt R2 im astabilen Zweig. Der ESP32 stellt den Wert per SPI ein, die Frequenz passt sich an.
+
+- Vorteil: der 555 bleibt der Oszillator — originalgetreu zum Tutorial-Thema.
+- Nachteil: Wertebereich des Potis begrenzt die Frequenz-Spanne. Für mehr Bereich mehrere C umschaltbar machen (Kondensator-Bank via Transistor-Schalter).
+
+### C.2 Den 555 ersetzen — LEDC (PWM) des ESP32
+
+Der ESP32 hat 16 LEDC-Kanäle mit bis zu 40 MHz. Ein `ledcSetup()` / `ledcWrite()` ersetzt den astabilen 555 komplett.
+
+- Vorteil: beliebige Frequenz, Duty Cycle beliebig, trivial in Software einzustellen.
+- Nachteil: **der 555 spielt keine Rolle mehr.** Als bewusster didaktischer Endpunkt ok — „und so geht es ganz ohne Timer-Baustein, wenn man will".
+
+## Ausbau D — Web-UI
+
+Der ESP32 kann WLAN. Mit `WebServer.h` lässt sich eine Mini-HTML-Seite ausliefern, auf der Mode-Buttons und ein Frequenz-Slider liegen. Das Programm ist dann quasi identisch zu Stufe 6, nur mit HTTP-Endpoints statt GPIO-Tastern.
+
+**Skizze:**
+
+```cpp
+#include <WiFi.h>
+#include <WebServer.h>
+
+WebServer server(80);
+
+void handleHalt()   { applyMode(MODE_HALT);   server.send(200, "text/plain", "HALT"); }
+void handleAuto()   { applyMode(MODE_AUTO);   server.send(200, "text/plain", "AUTO"); }
+void handleSingle() { applyMode(MODE_SINGLE); server.send(200, "text/plain", "SINGLE"); }
+void handleStep()   { if (currentMode == MODE_SINGLE) triggerStep(); server.send(200, "text/plain", "STEP"); }
+
+void setup() {
+  // … WiFi.begin(ssid, pass); …
+  server.on("/halt",   handleHalt);
+  server.on("/auto",   handleAuto);
+  server.on("/single", handleSingle);
+  server.on("/step",   handleStep);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+  // … plus der Code aus Stage 6 / 7 …
+}
+```
+
+Das HTML kann eine statische Seite im Flash-Dateisystem (SPIFFS/LittleFS) oder ein simples hartkodiertes Template sein. Für den Rahmen dieses Tutorials genügt letzteres.
 
 ## Abschluss
 
-_TODO:_ Zusammenfassung, Lessons Learned, mögliche nächste Projekte (z. B. einfache Logik-Schaltung ansteuern, CPU-Modell takten, Schrittmotor).
+Wenn du hier angekommen bist, hast du:
+
+- den **TLC555** in allen drei Grundmodi verstanden und aufgebaut,
+- einen **vollständigen Taktgenerator rein in Hardware** gebaut (Stufe 3),
+- den **ESP32** zum Beobachter und dann zum Controller gemacht (Stufen 5 und 6),
+- optional noch **Display, Poti, Web-UI** ergänzt (Stufe 7).
+
+### Mögliche nächste Projekte
+
+- **CPU-Modell takten:** eine einfache 4-Bit-CPU (Nibbler, SAP-1) braucht genau so einen Taktgenerator mit Auto/Single/Halt.
+- **Schrittmotor-Treiber:** Step-Signal aus dem Taktgenerator auf einen A4988.
+- **Debounce-Workshop:** vertiefen, wie man Taster in Hardware entprellt (RC + Schmitt-Trigger) und vergleichen mit der Software-Variante aus Stufe 6.
+- **Frequenz-Synthesizer:** NCO (Numerically Controlled Oscillator) auf dem ESP32 — der didaktische Gegenentwurf zum 555.
+
+Viel Spaß beim Weitertüfteln.
