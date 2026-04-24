@@ -68,3 +68,15 @@ ESP32-NE555-Tutorial/
 ```
 
 Schaltpläne, Code und Fotos kommen später in eigene Unterordner (`schematics/`, `code/`, `assets/`), sobald wir sie erzeugen.
+
+## Wie du dieses Tutorial liest
+
+- **Jede Stufe hat denselben Aufbau:** kurzer Ziel-Block, dann **„Was bauen wir?"**, Theorie, Schaltung, Aufbau, Messen, **Checkpoints**, Troubleshooting, **Rückblick**, Übergang zur nächsten Stufe.
+- **Baue mit.** Lesen allein bringt nichts — ein Breadboard vor dir und ein Multimeter daneben ist der Kern des Tutorials.
+- **Checkpoints** sind kleine Stopps, an denen du etwas sehen oder messen solltest. Wenn dort nichts passt, lohnt es sich, zurückzugehen, bevor du weiterbaust.
+- **Troubleshooting-Tabellen** listen die häufigsten Fehlerbilder. Die meisten Probleme im 555-Umfeld sind Klassiker — du bist damit nicht allein.
+- **Code-Skizzen liegen in `code/`** und lassen sich direkt in der Arduino-IDE öffnen.
+
+### Hinweis zu Fotos und Schaltplänen
+
+Das Repository enthält aktuell nur Text-Beschreibungen, Pin-Tabellen und ASCII-Skizzen. **Echte Schaltpläne und Aufbau-Fotos folgen**, sobald die Stufen in der Werkstatt wirklich aufgebaut wurden — solche Bilder sind der letzte Schritt, nicht der erste.

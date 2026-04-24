@@ -3,8 +3,21 @@
 **Ziel:** Einen definierten Einzelpuls pro Tastendruck erzeugen — Basis des späteren `single-step`-Modus.
 **Was du lernst:** Trigger-Verhalten (aktiv LOW), Pulsbreite `T ≈ 1,1 · R · C`, Tasterentprellung.
 **Voraussetzung:** [Stufe 0](00-grundlagen.md); hilfreich [Stufe 1](01-astabil.md)
+**Dauer:** ca. 30 Minuten
+
+## Was bauen wir?
+
+Einen **Taster + LED**, bei dem die LED für eine genau bestimmte Zeit (z. B. eine halbe Sekunde) aufleuchtet — unabhängig davon, wie lange du den Taster drückst. Das ist ein „One-Shot": ein Puls pro Knopfdruck. Aus diesem Baustein wird später im `single-step`-Modus der Einzeltakt.
 
 ## Theorie
+
+### Kurz und intuitiv
+
+Im Ruhezustand liegt der Kondensator C auf Masse (entladen). Ein kurzer Tastendruck **kippt** den 555 — OUT geht HIGH, und C beginnt über R zu laden. Sobald C die Schwelle 2/3 V<sub>CC</sub> erreicht, kippt der 555 zurück: OUT geht LOW, C wird wieder auf Masse gezogen. Die Pulslänge hängt also ausschließlich von R und C ab, **nicht** von der Tastendruck-Dauer.
+
+**Daumenregel:** größerer Widerstand oder größere Kapazität → längerer Puls.
+
+### Formell genauer
 
 Im monostabilen Modus hat der 555 einen **Ruhezustand** (OUT = LOW, Kondensator leer) und einen **aktiven Zustand** (OUT = HIGH, Kondensator lädt). Ein externer **LOW-Impuls** an TRIG (Pin 2) kippt den Baustein aus dem Ruhezustand; er kehrt nach einer festen Zeit `T` von alleine zurück.
 
@@ -84,6 +97,18 @@ Der Trigger-Eingang lässt sich auch direkt mit einem Logikpegel steuern — fal
    - Pin 2 über Pull-up an V<sub>CC</sub>; Taster von Pin 2 nach GND.
 5. LED + 330 Ω von Pin 3 nach GND.
 
+> **Checkpoint:** Versorgung ein. Taster drücken → LED leuchtet etwa 0,5 s auf und geht von alleine aus. Wenn ja: weiter. Wenn LED gar nicht angeht oder dauerhaft an bleibt: Troubleshooting unten.
+
+## Troubleshooting
+
+| Symptom | Mögliche Ursache |
+|---------|------------------|
+| LED reagiert nicht auf Tastendruck | Pin 2 hat keinen Pull-up → Trigger-Flanke kommt nie sauber zustande. |
+| LED bleibt dauerhaft an | Pin 2 bleibt LOW (Taster klemmt, Pull-up fehlt). Oder Pin 4 (RESET) ist nicht auf V<sub>CC</sub>. |
+| Puls ist viel zu kurz / viel zu lang | R oder C falsch dimensioniert; Elko vertauscht (+/−). |
+| Beim Halten des Tasters bleibt LED länger an | Erwartetes Verhalten in Variante A. Für feste Pulslänge auf Variante B wechseln (10 nF in Reihe zum Taster). |
+| Zweiter Tastendruck während des Pulses verlängert nichts | Das ist korrekt — der Baustein ist non-retriggerbar. |
+
 ## Messen & Beobachten
 
 - **Taster kurz drücken:** LED leuchtet für ~0,5 s auf.
@@ -98,6 +123,15 @@ Im **DC-V**-Modus an Pin 3 zeigt der Mittelwert, wie oft du pro Zeiteinheit gedr
 **Mit Oszilloskop:**
 
 Tastkopf an Pin 6. Du siehst eine schöne RC-Ladekurve, die bei 2/3 V<sub>CC</sub> abbricht und senkrecht auf 0 V zurückfällt — genau das, was die Theorie vorhersagt.
+
+## Rückblick
+
+Was du jetzt kannst:
+
+- Einen **monostabilen 555** als One-Shot-Pulsgenerator aufbauen.
+- Die **Pulslänge** gezielt über R und C einstellen.
+- Das **Trigger-Verhalten** nutzen (aktiv LOW, non-retriggerbar).
+- Den Taster **entprellen**, ohne eine Software zu schreiben (entweder über lange Pulszeit oder über kapazitive AC-Kopplung).
 
 ## Übergang zur nächsten Stufe
 

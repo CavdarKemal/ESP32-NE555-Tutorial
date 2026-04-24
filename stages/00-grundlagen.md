@@ -3,6 +3,11 @@
 **Ziel:** Den 555-Timer verstehen, bevor wir ihn verschalten.
 **Was du lernst:** Pinbelegung, interne Funktion (vereinfacht), die drei Grundmodi, Unterschiede zwischen den 555-Varianten.
 **Voraussetzung:** keine
+**Dauer:** ca. 15 Minuten Lesezeit, kein Aufbau
+
+## Was bauen wir?
+
+Diese Stufe ist die einzige **ohne Breadboard**. Du lernst den TLC555 kennen: wie er aussieht, welche Pins was tun und warum er drei völlig verschiedene Dinge kann. Die Stufe ist bewusst kurz — wenn du ungeduldig bist, überflieg sie und starte mit [Stufe 1](01-astabil.md); du kommst zum Nachschlagen ohnehin hierher zurück.
 
 ## Pinbelegung (DIP-8)
 
@@ -76,11 +81,15 @@ Alle drei sind pinkompatibel. Unterschiede spürt man vor allem bei **Versorgung
 - Die extrem hochohmigen CMOS-Eingänge erlauben sehr große R-Werte im Timing-Zweig (bis einige MΩ), ohne dass der Eingangsstrom die Zeitkonstante verfälscht. Praktisch für sehr langsame Takte.
 - Der klassische NE555 gehört zum Kulturgut, aber sein höherer Versorgungsstrom und der 5-V-Mindestpegel passen schlechter zum ESP32.
 
-## Zusammenfassung
+## Rückblick
 
-- Pinout und die beiden magischen Spannungen **1/3** und **2/3 V<sub>CC</sub>** sitzen.
+Was du jetzt weißt:
+
+- Der TLC555 ist ein **8-poliger Timer-Baustein**, pinkompatibel zum NE555.
+- Die beiden entscheidenden Spannungen sind **1/3** und **2/3 V<sub>CC</sub>** — alles Schwingverhalten dreht sich um sie.
 - Drei Modi: **astabil** (Takt), **monostabil** (Einzelpuls), **bistabil** (Latch).
-- TLC555 ist unsere Wahl — 3,3-V-fähig, sparsam, ESP32-kompatibel.
+- Reset (Pin 4) ist ein **Aus-Schalter**, den wir später für den `halt`-Modus brauchen.
+- Für uns ist der TLC555 (CMOS, 3,3 V) besser als der klassische NE555 — kein Pegelwandler nötig.
 
 ## Übergang zur nächsten Stufe
 

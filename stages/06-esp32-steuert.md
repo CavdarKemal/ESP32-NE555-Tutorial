@@ -3,6 +3,13 @@
 **Ziel:** Die drei Modi `auto` / `single` / `halt` per ESP32 umschalten — das Kernziel des Tutorials.
 **Was du lernst:** State-Machine in C++, Tasterentprellung per `millis()`, Reset-Pin-Steuerung von außen, sauberes Triggern des Monostabilen.
 **Voraussetzung:** [Stufe 2](02-monostabil.md), [Stufe 3](03-halt-reset.md), [Stufe 4](04-esp32-einstieg.md) (empfohlen zusätzlich [Stufe 5](05-esp32-beobachtet.md))
+**Dauer:** ca. 60–90 Minuten
+
+## Was bauen wir?
+
+Die **Zielstufe des Tutorials.** Der Hardware-Taktgenerator aus Stufe 3 bleibt im Prinzip so, wie er ist — nur statt des Dreh- oder Kippschalters steuert ihn jetzt der ESP32. Vier kleine Taster wählen den Modus (`halt` / `auto` / `single` / `step`), drei Status-LEDs zeigen den aktuellen Modus. Im Serial Monitor siehst du jeden Moduswechsel.
+
+Funktional ändert sich wenig gegenüber Stufe 3 — aber du hast jetzt die Grundlage für alles, was in Stufe 7 möglich wird: Display, Poti, Web-UI, Automatisierung.
 
 ## Konzept
 
@@ -117,6 +124,20 @@ Der Step-Taster wirkt nur im `SINGLE`-Mode — ein Druck im `HALT` oder `AUTO` w
 5. ESP32 **mit gemeinsamer Masse** koppeln.
 6. Sketch flashen, Serial Monitor öffnen.
 
+> **Checkpoint:** Nach dem Reset brennt die `HALT`-LED, Serial Monitor meldet `Mode: HALT`. Der gemeinsame OUT ist LOW. Keine der anderen beiden LEDs leuchtet. Wenn ja: Software läuft, Hardware ist richtig gekoppelt.
+
+## Troubleshooting
+
+| Symptom | Mögliche Ursache |
+|---------|------------------|
+| Keine LED leuchtet nach Boot | Gemeinsame Masse ESP32 ↔ 555-Versorgung vergessen, oder Vorwiderstände an den LEDs falsch herum / viel zu groß. |
+| Mode-Taster lösen mehrmals aus | `DEBOUNCE_MS` zu klein (versuche 40–50), oder Taster hat bauartbedingt starkes Prellen — ein 100-nF-Cap über die Tasterkontakte hilft zusätzlich. |
+| `AUTO` eingeschaltet, aber OUT bleibt LOW | RESET_A wird vom ESP32 nicht wirklich HIGH; GPIO 25 mit Multimeter nachmessen. Oder Pull-down aus Stufe 3 vergessen zu entfernen und der Widerstand zieht zu stark gegen GND (100 kΩ sollte ok sein, kleinere Werte nicht). |
+| `SINGLE` + Step-Taster macht nichts | TRIG_B-Leitung vom ESP32 nicht an Pin 2 von 555 B; oder Pull-up an Pin 2 fehlt und TRIG floated. |
+| Step-Taster triggert auch im `HALT`/`AUTO` sichtbar am Ausgang | Darf er nicht — die Software filtert das. Prüfen, dass `detectPressEdge(btnStep)` nur innerhalb der `currentMode == MODE_SINGLE`-Bedingung aufgerufen wird. |
+| Serial Monitor zeigt Buchstabensalat | Baudrate nicht 115200. |
+| Moduswechsel ok, aber keine Frequenzanzeige | Die Frequenzmessung aus Stufe 5 ist optional — nur aktiv, wenn du den Stufe-5-Code in diesen Sketch integriert hast. |
+
 ## Messen & Beobachten
 
 - Jeder Mode-Taster löst einen Ausdruck am Serial Monitor aus und schaltet die passende Status-LED.
@@ -132,6 +153,18 @@ Wer die Frequenzmessung aus [Stufe 5](05-esp32-beobachtet.md) mitflasht, sieht n
 - **Warum nicht alles in Software?** Könnten wir — der ESP32 hat PWM und Software-Timer. Thema des Tutorials ist aber der 555. Die Hybrid-Lösung zeigt das Zusammenspiel analoger Timer und MCU.
 - **Genauigkeit des Step-Pulses:** die Pulsbreite bestimmt der 555 B aus seinem R·C. Der ESP32 gibt nur das „Go". Das ist genau die Arbeitsteilung, die man in echten Systemen findet.
 - **Jitter?** Moduswechsel kommen mit der Jitter-Zeit des `loop()`-Intervalls (Mikrosekunden). Für einen sichtbaren Taktgenerator unsichtbar.
+
+## Rückblick
+
+Was du jetzt kannst:
+
+- Eine **einfache State-Machine** in Arduino/C++ schreiben.
+- Taster **per `millis()` entprellen** (Edge-Detection ohne blockierendes `delay`).
+- Externe Logikbausteine über GPIOs **sauber ansteuern** (Idle-Pegel, kurzer Trigger-Puls).
+- Mehrere Schaltungsteile (zwei 555er + ESP32) auf gemeinsamer Versorgung **konfliktfrei** koppeln.
+- Ein **Hybrid-System** aus analogem Timer und Mikrocontroller aufbauen — eine der Grundformen realer Elektronik.
+
+Herzlichen Glückwunsch: das ist das Tutorial-Ziel.
 
 ## Übergang zur nächsten Stufe
 

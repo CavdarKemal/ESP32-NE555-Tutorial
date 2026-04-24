@@ -3,6 +3,13 @@
 **Ziel:** Alle drei Modi `auto` / `single` / `halt` **ohne Mikrocontroller** realisieren.
 **Was du lernst:** Reset-Eingang (Pin 4) des 555 richtig nutzen, zwei 555er kombinieren, Ausgänge per Dioden-OR verbinden.
 **Voraussetzung:** [Stufe 1](01-astabil.md) und [Stufe 2](02-monostabil.md)
+**Dauer:** ca. 45–60 Minuten
+
+## Was bauen wir?
+
+Den **fertigen Taktgenerator** — mit einem **Dreh- oder Kippschalter**, der zwischen `auto` (freilaufender Takt), `single` (ein Puls pro Step-Taste) und `halt` (Ausgang still) wählt. Zwei TLC555 arbeiten parallel, ein gemeinsamer Ausgang bedient eine LED.
+
+Diese Stufe ist der **Meilenstein des Tutorials**: hier läuft die volle Funktion, und zwar komplett ohne Mikrocontroller. Alles, was danach kommt, ist „Ersatzteil plus Luxus".
 
 ## Theorie
 
@@ -91,6 +98,19 @@ Breadboard-Layout: beide 555er **nebeneinander**, gemeinsame Masse- und V<sub>CC
 5. Zwei 100-kΩ-Pull-downs von RESET_A bzw. RESET_B nach GND.
 6. SP3T-Schalter: Mittelkontakt an V<sub>CC</sub>, die drei Ausgangskontakte an RESET_A / (nichts) / RESET_B.
 
+> **Checkpoint:** Versorgung ein, Schalter auf `auto` → LED blinkt (wie in Stufe 1). Schalter auf `halt` → LED aus. Schalter auf `single`, Step-Taste drücken → kurzer Puls. Alle drei Modi durchschalten und nochmal zurück — der Wechsel muss sauber sein.
+
+## Troubleshooting
+
+| Symptom | Mögliche Ursache |
+|---------|------------------|
+| `auto` blinkt, aber `halt` schaltet nicht ab | Pull-downs an RESET_A/B fehlen oder falsch verdrahtet — der Reset-Pin „schwebt" und wird als HIGH interpretiert. |
+| `halt` und `auto` gehen, aber `single` gibt keinen Puls | Step-Taster am TRIG-Pin von 555 B prüfen; Pull-up auf TRIG_B vorhanden? |
+| LED flackert kurz beim Moduswechsel | Normal — die Dioden-OR-Leitung hat einen kurzen Umschalt-Transienten. |
+| Gesamt-OUT zeigt schwächere HIGH-Pegel als V<sub>CC</sub> | Auch normal — die 1N4148 fällt ca. 0,5 V ab. Für LED und ESP32-Input unkritisch. |
+| 555 A blinkt im `single`-Modus weiter mit | RESET_A wird vom Schalter nicht wirklich auf LOW gezogen — Schalter-Verdrahtung oder Pull-down-Widerstand prüfen. |
+| Alle Modi produzieren Dauer-HIGH am OUT | Ein Diodeneingang ist falsch herum gesteckt. Kathodenring muss Richtung OUT zeigen. |
+
 ## Messen & Beobachten
 
 - **`halt`:** LED aus, OUT = 0 V (Multimeter DC).
@@ -101,6 +121,17 @@ Breadboard-Layout: beide 555er **nebeneinander**, gemeinsame Masse- und V<sub>CC
 **Bonus — Was macht der Timing-Kondensator beim `halt`?**
 
 Bei LOW an Pin 4 zieht der Entlade-Transistor den Timing-Kondensator aktiv auf GND. Wenn du die Spannung an C misst, ist sie bei `halt` praktisch 0 V. Wechsel nach `auto` → C beginnt aus 0 V zu laden, nicht aus 1/3 V<sub>CC</sub>. Das ergibt einen minimal längeren ersten Takt, der in der Praxis aber kaum auffällt.
+
+## Rückblick
+
+Was du jetzt kannst:
+
+- Zwei 555er **gleichzeitig** in einer Schaltung betreiben.
+- Den **Reset-Pin (Pin 4)** gezielt nutzen, um einen 555 still-zulegen.
+- Ausgänge per **Dioden-OR** kombinieren — und weißt, warum die Pull-downs dabei wichtig sind.
+- Einen **vollständigen Auto/Single/Halt-Taktgenerator rein analog** aufbauen.
+
+Bemerkenswert: du könntest ab hier **aufhören**. Die Schaltung funktioniert. Alles, was wir in den Stufen 4–7 tun, ersetzt oder erweitert den Mode-Schalter — sie fügt **keine neue Kernfunktion** hinzu.
 
 ## Übergang zur nächsten Stufe
 

@@ -3,8 +3,23 @@
 **Ziel:** Einen freilaufenden Oszillator aufbauen — der Kern des späteren `auto`-Modus.
 **Was du lernst:** RC-Zeitkonstante, Duty Cycle, Frequenzformel, drei Schaltungsvarianten.
 **Voraussetzung:** [Stufe 0](00-grundlagen.md)
+**Dauer:** ca. 30–45 Minuten mit Aufbau
+
+## Was bauen wir?
+
+Eine **blinkende LED**, die von einem TLC555 gesteuert wird. Kein Mikrocontroller, kein Code — nur ein Timer-Baustein, zwei Widerstände und ein Kondensator. Am Ende hast du drei Varianten der Schaltung aufgebaut und kannst ihre Unterschiede am Oszilloskop oder Multimeter sehen.
+
+Das wirkt klein, ist aber der **wichtigste Baustein** des ganzen Tutorials: alles, was später kommt, baut darauf auf.
 
 ## Theorie
+
+### Kurz und intuitiv
+
+Ein Kondensator wird über einen Widerstand aus V<sub>CC</sub> **langsam geladen**. Erreicht seine Spannung 2/3 V<sub>CC</sub>, kippt der 555 um und entlädt den Kondensator wieder — bis er 1/3 V<sub>CC</sub> unterschreitet, dann beginnt der Zyklus von vorne. Das Ergebnis am Ausgang: ein Rechteck.
+
+**Daumenregel:** größerer Widerstand oder größere Kapazität → langsameres Blinken. Kleinere Werte → schnelleres Blinken.
+
+### Formell
 
 Im astabilen Modus brücken wir TRIG (Pin 2) und THRES (Pin 6) und hängen sie an einen Kondensator `C`. Der Kondensator wird über `R1 + R2` aus V<sub>CC</sub> geladen und über `R2` plus Pin 7 (DISCH) entladen. Sobald die Kondensatorspannung zwischen **1/3 V<sub>CC</sub>** und **2/3 V<sub>CC</sub>** hin- und herpendelt, schwingt der Baustein von alleine.
 
@@ -94,10 +109,18 @@ Ein schöner, sichtbarer Bereich zum Spielen.
 5. Timing-Zweig `R1 / R2 / C` aufbauen, Pins 2 und 6 brücken.
 6. LED + 330-Ω-Vorwiderstand zwischen Pin 3 und GND.
 
-> **Häufige Fehler:**
-> - Pin 4 offen gelassen → Ausgang bleibt LOW.
-> - Pin 5 ohne Kondensator → Takt jittert, vor allem bei niedriger Versorgung.
-> - Elko falsch gepolt → explodiert bei 3,3 V zwar nicht, verfälscht aber die Zeit deutlich.
+> **Checkpoint:** Versorgung einschalten. Die LED sollte jetzt sichtbar im Sekundentakt blinken. Wenn ja → weiter bei Messen & Beobachten. Wenn nicht → Troubleshooting unten.
+
+## Troubleshooting
+
+| Symptom | Mögliche Ursache |
+|---------|------------------|
+| LED bleibt dauerhaft aus | Pin 4 (RESET) ist nicht auf V<sub>CC</sub> — der Baustein ist stillgelegt. |
+| LED leuchtet dauerhaft (hell) | R1 oder R2 ist nicht wie geplant verdrahtet; Pin 7 hängt „in der Luft". |
+| LED glimmt unruhig, Frequenz stark schwankend | Pin 5 (CTRL) ohne 100-nF-Kondensator nach GND — die internen Schwellen zittern. |
+| LED blinkt viel schneller als erwartet | Kondensator C nicht verdrahtet (nur Leitungskapazität wirkt) oder völlig falscher Wert gesteckt. |
+| LED blinkt viel langsamer als erwartet | Elko falsch gepolt (lädt dann mit effektiv viel kleinerem C) oder R2 deutlich größer als geplant. |
+| Ausgang ist kein Rechteck, sondern dreieckig | Du misst womöglich an Pin 6 (das ist die Ladekurve, nicht der Ausgang); der Ausgang liegt an Pin 3. |
 
 ## Messen & Beobachten
 
@@ -118,6 +141,18 @@ Daraus Duty zurückrechnen und gegen die Formel prüfen.
 ### Mit dem Oszilloskop (optional, aber lehrreich)
 
 Klemme den Tastkopf parallel zu C (Pin 6 nach GND). Du siehst die **Sägezahn-Ladekurve** zwischen 1/3 und 2/3 V<sub>CC</sub>. Parallel dazu den Ausgang (Pin 3) beobachten — das Umschalten passiert genau an den Schwellwerten. Das Aha-Bild zum 555.
+
+> **Checkpoint:** Du solltest jetzt a) eine blinkende LED haben, b) eine plausible Frequenz gemessen haben (per Augen-Zählung, Multimeter-Hz oder Oszi). Wenn alle drei Messungen ähnliche Werte zeigen: super, du hast den astabilen 555 wirklich verstanden.
+
+## Rückblick
+
+Was du jetzt kannst:
+
+- Einen **astabilen Oszillator** mit TLC555 aus drei Bauteilen (R1, R2, C) aufbauen.
+- Die **Frequenz** gezielt wählen (Formel oder Tabelle).
+- Den **Duty Cycle** verändern — mit Dioden-Trick sogar auf genau 50 %.
+- Die Frequenz mit **Augen, Multimeter oder Oszi** messen.
+- Typische **Verdrahtungsfehler** erkennen (Pin 4 offen, Pin 5 ohne Cap, Elko verkehrt).
 
 ## Übergang zur nächsten Stufe
 

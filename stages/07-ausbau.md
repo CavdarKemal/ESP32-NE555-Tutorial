@@ -3,8 +3,18 @@
 **Ziel:** Das Projekt komfortabler und vorzeigbar machen.
 **Was du lernst:** I²C-Display (SSD1306), ADC am ESP32, Digital-Poti via SPI, Web-Server-Grundlagen.
 **Voraussetzung:** [Stufe 6](06-esp32-steuert.md)
+**Dauer:** je Ausbau ca. 30–60 Minuten
 
-Diese Stufe ist optional und modular — jeder der vier Ausbauten ist für sich allein umsetzbar.
+## Was bauen wir?
+
+Vier **unabhängige Erweiterungen** des Controllers aus Stufe 6. Such dir eine aus — oder mach alle hintereinander. Jede ist für sich alleine umsetzbar, keine hängt zwingend an der anderen:
+
+- **A — OLED-Statusanzeige:** Modus, Ist-Frequenz und Step-Zähler auf einem 0,96"-Display.
+- **B — Frequenz-Sollwert per Poti:** Drehknopf an einem ADC-Pin, Soll- und Ist-Wert nebeneinander.
+- **C — Frequenz wirklich einstellen:** Digital-Poti als R2, oder der ESP32 ersetzt den 555-Oszillator ganz.
+- **D — Web-UI:** Handy oder Laptop im WLAN steuern den Taktgenerator.
+
+Das ist Lehrgeld in kleineren Portionen — der Kern ist fertig, hier kommen die Kür-Elemente.
 
 ## Ausbau A — Status-OLED (SSD1306)
 
