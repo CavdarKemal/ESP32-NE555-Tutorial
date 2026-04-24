@@ -1,0 +1,8 @@
+# Vor der Simulation kompilieren, z.B. mit arduino-cli:
+#   arduino-cli compile --fqbn esp32:esp32:esp32doit-devkit-v1 --output-dir build
+# Alternativ Arduino IDE: Sketch > Export Compiled Binary und die Pfade unten anpassen.
+
+[wokwi]
+version = 1
+firmware = 'build/stage05_freqmeter.ino.bin'
+elf = 'build/stage05_freqmeter.ino.elf'

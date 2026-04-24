@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "author": "ESP32-NE555-Tutorial",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-led",        "id": "ledHalt",   "top": -220, "left": 260, "attrs": { "color": "red",    "label": "HALT"   } },
+    { "type": "wokwi-resistor",   "id": "rHalt",     "top": -150, "left": 260, "attrs": { "value": "330" } },
+    { "type": "wokwi-led",        "id": "ledAuto",   "top": -220, "left": 360, "attrs": { "color": "green",  "label": "AUTO"   } },
+    { "type": "wokwi-resistor",   "id": "rAuto",     "top": -150, "left": 360, "attrs": { "value": "330" } },
+    { "type": "wokwi-led",        "id": "ledSingle", "top": -220, "left": 460, "attrs": { "color": "yellow", "label": "SINGLE" } },
+    { "type": "wokwi-resistor",   "id": "rSingle",   "top": -150, "left": 460, "attrs": { "value": "330" } },
+
+    { "type": "wokwi-led",        "id": "ledRstA",   "top":  100, "left": 260, "attrs": { "color": "blue",   "label": "RST_A"  } },
+    { "type": "wokwi-resistor",   "id": "rRstA",     "top":  170, "left": 260, "attrs": { "value": "330" } },
+    { "type": "wokwi-led",        "id": "ledRstB",   "top":  100, "left": 360, "attrs": { "color": "blue",   "label": "RST_B"  } },
+    { "type": "wokwi-resistor",   "id": "rRstB",     "top":  170, "left": 360, "attrs": { "value": "330" } },
+    { "type": "wokwi-led",        "id": "ledTrgB",   "top":  100, "left": 460, "attrs": { "color": "orange", "label": "TRG_B"  } },
+    { "type": "wokwi-resistor",   "id": "rTrgB",     "top":  170, "left": 460, "attrs": { "value": "330" } },
+
+    { "type": "wokwi-pushbutton", "id": "btnHalt",   "top":  280, "left": -220, "attrs": { "color": "red",    "label": "HALT"   } },
+    { "type": "wokwi-pushbutton", "id": "btnAuto",   "top":  280, "left": -120, "attrs": { "color": "green",  "label": "AUTO"   } },
+    { "type": "wokwi-pushbutton", "id": "btnSingle", "top":  280, "left":  -20, "attrs": { "color": "yellow", "label": "SINGLE" } },
+    { "type": "wokwi-pushbutton", "id": "btnStep",   "top":  400, "left": -120, "attrs": { "color": "blue",   "label": "STEP"   } }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+
+    [ "esp:D18", "rHalt:1",   "green",  [ "v0" ] ],
+    [ "rHalt:2", "ledHalt:A", "green",  [ "v0" ] ],
+    [ "ledHalt:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "esp:D19", "rAuto:1",   "green",  [ "v0" ] ],
+    [ "rAuto:2", "ledAuto:A", "green",  [ "v0" ] ],
+    [ "ledAuto:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "esp:D21", "rSingle:1",   "green",  [ "v0" ] ],
+    [ "rSingle:2", "ledSingle:A", "green", [ "v0" ] ],
+    [ "ledSingle:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "esp:D25", "rRstA:1",   "blue",  [ "v0" ] ],
+    [ "rRstA:2", "ledRstA:A", "blue",  [ "v0" ] ],
+    [ "ledRstA:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "esp:D26", "rRstB:1",   "blue",  [ "v0" ] ],
+    [ "rRstB:2", "ledRstB:A", "blue",  [ "v0" ] ],
+    [ "ledRstB:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "esp:D27", "rTrgB:1",   "orange", [ "v0" ] ],
+    [ "rTrgB:2", "ledTrgB:A", "orange", [ "v0" ] ],
+    [ "ledTrgB:C", "esp:GND.2", "black", [ "v0" ] ],
+
+    [ "btnHalt:1.l",   "esp:D32", "red",    [ "v0" ] ],
+    [ "btnHalt:2.l",   "esp:GND.1", "black", [ "v0" ] ],
+    [ "btnAuto:1.l",   "esp:D33", "green",  [ "v0" ] ],
+    [ "btnAuto:2.l",   "esp:GND.1", "black", [ "v0" ] ],
+    [ "btnSingle:1.l", "esp:D14", "yellow", [ "v0" ] ],
+    [ "btnSingle:2.l", "esp:GND.1", "black", [ "v0" ] ],
+    [ "btnStep:1.l",   "esp:D13", "blue",   [ "v0" ] ],
+    [ "btnStep:2.l",   "esp:GND.1", "black", [ "v0" ] ]
+  ]
+}
