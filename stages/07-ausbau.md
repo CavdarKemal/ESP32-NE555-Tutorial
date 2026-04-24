@@ -33,11 +33,19 @@ Ein 0,96"-OLED über I²C zeigt Modus, aktuelle Frequenz (aus Stufe 5) und den S
 
 ### Bibliothek
 
-Arduino → Werkzeuge → Bibliotheksverwalter → „Adafruit SSD1306" installieren. Zieht „Adafruit GFX" automatisch mit.
+**Arduino IDE:** Werkzeuge → Bibliotheksverwalter → „Adafruit SSD1306" installieren. Zieht „Adafruit GFX" automatisch mit.
+
+**`arduino-cli` (für den Wokwi-Workflow aus dem [Anhang](anhang-wokwi.md)):**
+```
+arduino-cli lib install "Adafruit SSD1306"
+```
+Dasselbe Paket wie in der IDE — `Adafruit GFX Library` und `Adafruit BusIO` kommen als Abhängigkeiten mit. Ohne diesen Schritt scheitert `arduino-cli compile` mit `fatal error: Adafruit_GFX.h: No such file or directory`.
 
 ### Code
 
 Grundgerüst mit Frequenzmessung und Platzhalter-Modus: [`code/stage07_oled/stage07_oled.ino`](../code/stage07_oled/stage07_oled.ino). Für den vollen Funktionsumfang den Stufe-6-Code dort einbauen und `modeText` / `stepCount` aus der State-Machine übernehmen.
+
+![Wokwi-Simulation: ESP32 mit SSD1306-OLED (zeigt Mode, Frequenz, Step-Count) und Slide-Switch als Puls-Stimulus](../assets/stage-07/wokwi-oled.jpg)
 
 ## Ausbau B — Frequenz-Sollwert per Poti
 

@@ -37,6 +37,8 @@ Für unsere Zwecke frei und bequem: **GPIO 13, 14, 18, 19, 21, 22, 23, 25, 26, 2
 
 ## Toolchain einrichten
 
+> **Kein ESP32 zur Hand?** Die Sketches ab dieser Stufe lassen sich statt auf echter Hardware auch im **Wokwi-Simulator** ausführen. Setup-Anleitung: [Anhang — Wokwi einrichten](anhang-wokwi.md). Der Hauptweg bleibt aber der reale Aufbau — am Steckbrett siehst du Effekte, die kein Simulator reproduziert.
+
 ### Arduino IDE installieren
 
 1. [arduino.cc/en/software](https://www.arduino.cc/en/software) → „Arduino IDE 2.x" für Windows herunterladen, installieren.
@@ -91,6 +93,8 @@ Kompilieren (Häkchen-Symbol), hochladen (Pfeil-Symbol). Beim Upload kurz warten
 
 **Rückbezug zu Stufe 1:** Das ist ein 1-Hz-Blink in Software. Er macht funktional dasselbe wie der astabile TLC555 — nur dass die Frequenz jetzt vom Quarz des ESP32 stammt (genauer) und wir sie per Code beliebig ändern können.
 
+![Wokwi-Simulation: ESP32 mit roter LED an GPIO 2 und Vorwiderstand](../assets/stage-04/wokwi-blink.jpg)
+
 ### Sketch 2 — Taster lesen
 
 Taster zwischen **GPIO 32** und GND; der interne Pull-up schaltet auf HIGH, Druck zieht auf LOW. LED auf GPIO 2 spiegelt den Tastendruck, Serial Monitor meldet jede fallende Flanke.
@@ -100,6 +104,8 @@ Code: [`code/stage04_button/stage04_button.ino`](../code/stage04_button/stage04_
 Serial Monitor öffnen (Lupen-Symbol), Baudrate auf **115200** setzen.
 
 > **Checkpoint:** Taster drücken → Onboard-LED geht an, Serial Monitor zeigt „Button pressed". Loslassen → LED aus, keine neue Meldung.
+
+![Wokwi-Simulation: ESP32 mit Taster an GPIO 32 und LED an GPIO 2](../assets/stage-04/wokwi-button.jpg)
 
 ### Rückbezug auf Hardware-555
 

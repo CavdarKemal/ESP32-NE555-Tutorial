@@ -53,7 +53,7 @@ Nimm die Schaltung aus Stufe 3 und ersetze:
 - **Mode-Schalter** → drei Leitungen vom ESP32 (RESET_A, RESET_B) und vier Tastern zum ESP32.
 - **Step-Taster am 555 B Pin 2** → Leitung vom ESP32 GPIO 27 an 555 B Pin 2. Der vorhandene 10-kΩ-Pull-up an Pin 2 kann **bleiben** — der ESP32 treibt im Idle HIGH, also gibt es keinen Konflikt. Alternativ kann er entfallen.
 
-> **Warum nicht kapazitiv koppeln?** Wir könnten TRIG_B per 10 nF AC-koppeln, um ganz unabhängig von der Pegel-Haltezeit zu sein. Mit einem definierten 10-ms-LOW-Puls aus der Software brauchen wir das aber nicht — einfacher ist einfacher.
+> **Warum nicht kapazitiv koppeln?** Wir könnten TRIG_B per 10 nF AC-koppeln, um ganz unabhängig von der Pegel-Haltezeit zu sein. Mit einem definierten LOW-Puls aus der Software brauchen wir das aber nicht — einfacher ist einfacher.
 
 ### Optional: Frequenzmessung aus Stufe 5 parallel
 
@@ -69,7 +69,7 @@ Vollständig in [`code/stage06_controller/stage06_controller.ino`](../code/stage
 2. **`enum Mode`** und globales `currentMode`.
 3. **Button-Struktur** mit Entprellung per `millis()` — `detectPressEdge()` liefert genau beim Drücken einmal `true`.
 4. **`applyMode(Mode)`** setzt die beiden RESET-Pins und die Status-LEDs passend zur Tabelle oben.
-5. **`triggerStep()`** erzeugt einen 10-ms-LOW-Puls an TRIG_B.
+5. **`triggerStep()`** erzeugt einen LOW-Puls an TRIG_B (Länge: `TRIG_PULSE_MS`, Default 150 ms — der 555 B-Trigger reagiert auf die fallende Flanke, die genaue Pulsdauer ist unkritisch; 150 ms macht den Puls auch im Wokwi-Sim sichtbar).
 
 ### Entprellung
 
@@ -111,9 +111,9 @@ if (detectPressEdge(btnStep) && currentMode == MODE_SINGLE) {
 
 Der Step-Taster wirkt nur im `SINGLE`-Mode — ein Druck im `HALT` oder `AUTO` wird einfach ignoriert. Der 555 B hätte im `HALT` keinen Reset und würde den Trigger ohnehin nicht verwerten, aber das **explizite** Ignorieren ist sauberer.
 
-### `delay(10)` im Trigger — ist das ok?
+### Blockierendes `delay()` im Trigger — ist das ok?
 
-`triggerStep()` blockiert für 10 ms. Das ist für eine reine Handbedienung unproblematisch; niemand drückt sinnvoll 100× pro Sekunde. Wer es sauber machen möchte, implementiert den Trigger als nicht-blockierende Mini-State-Machine mit `millis()`.
+`triggerStep()` blockiert für die Länge von `TRIG_PULSE_MS` (150 ms). Für eine reine Handbedienung unproblematisch; niemand drückt sinnvoll 6× pro Sekunde. Wer es sauber machen möchte, implementiert den Trigger als nicht-blockierende Mini-State-Machine mit `millis()` — dann kann die Pulsdauer auch wieder klein werden (10 ms reichen am echten 555 locker).
 
 ## Aufbau-Reihenfolge (empfohlen)
 
@@ -147,6 +147,10 @@ Der Step-Taster wirkt nur im `SINGLE`-Mode — ein Druck im `HALT` oder `AUTO` w
 - **STEP-Taster außerhalb von SINGLE:** keine Wirkung, nur ignoriert.
 
 Wer die Frequenzmessung aus [Stufe 5](05-esp32-beobachtet.md) mitflasht, sieht nebenbei die Ist-Frequenz des `AUTO`-Modus.
+
+> **Wenn du im Wokwi simulierst:** Dort fehlen die eigentlichen 555er. Du siehst nur die **Steuersignale** des ESP32 — `RST_A`-LED dauerhaft an (555 A wäre freigegeben), `TRG_B`-LED kurz dunkel beim STEP (fallende Flanke am Trigger-Eingang). Das sichtbare Blinken des AUTO-Takts und das One-Shot-Pulsen im SINGLE-Modus erlebst du erst im echten Aufbau — Wokwi zeigt hier ausdrücklich die MCU-Seite, nicht die Timer-Ausgabe.
+
+![Wokwi-Simulation: ESP32 mit drei Status-LEDs (HALT/AUTO/SINGLE), drei Output-LEDs (RST_A/RST_B/TRG_B) und vier Tastern](../assets/stage-06/wokwi-controller.jpg)
 
 ## Diskussion
 

@@ -38,7 +38,10 @@ constexpr uint8_t PIN_LED_SINGLE = 21;
 
 // ---------- Konstanten ----------
 constexpr uint32_t DEBOUNCE_MS   = 25;
-constexpr uint32_t TRIG_PULSE_MS = 10;   // LOW-Puls an TRIG_B
+constexpr uint32_t TRIG_PULSE_MS = 150;  // LOW-Puls an TRIG_B. Grosszuegig, damit der
+                                         // Puls im Wokwi-Sim an der TRG_B-LED sichtbar
+                                         // wird; der echte 555 B triggert ohnehin auf
+                                         // die fallende Flanke, nicht auf die Pulsdauer.
 
 // ---------- Mode-State ----------
 enum Mode : uint8_t { MODE_HALT = 0, MODE_AUTO = 1, MODE_SINGLE = 2 };

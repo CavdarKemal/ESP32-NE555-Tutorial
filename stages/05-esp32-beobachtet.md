@@ -109,6 +109,10 @@ Der Block `noInterrupts() … interrupts()` sorgt dafür, dass das Auslesen und 
 
 > **Checkpoint:** Sekündlich erscheint im Serial Monitor eine Frequenz nahe dem Wert, den du aus Stufe 1 berechnet hast (bei Startwerten R1=10k, R2=47k, C=10µF ≈ 1,4 Hz). Am Poti drehen → Anzeige folgt in wenigen Sekunden.
 
+![Wokwi-Simulation: ESP32 mit Slide-Switch als manueller Puls-Stimulus an GPIO 34, 10-kΩ-Pull-down](../assets/stage-05/wokwi-freqmeter.jpg)
+
+> **Wokwi-Hinweis:** Oben siehst du die Wokwi-Variante dieser Stufe. Statt eines echten 555 dient ein Schiebeschalter als Puls-Stimulus — jede Bewegung erzeugt eine (prellende) Flanke, die der ESP32 zählt. Siehe [Anhang — Wokwi einrichten](anhang-wokwi.md).
+
 ## Troubleshooting
 
 | Symptom | Mögliche Ursache |

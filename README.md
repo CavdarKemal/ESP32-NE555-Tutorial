@@ -40,6 +40,7 @@ Der klassische NE555 wird in einem Kurz-Exkurs erwähnt (Unterschiede beim Lesen
 | [5](stages/05-esp32-beobachtet.md) | ESP32 misst den Takt | Frequenzanzeige via Serial Monitor |
 | [6](stages/06-esp32-steuert.md) | ESP32 steuert den Taktgenerator | **Ziel: Mode-Controller in Software** |
 | [7](stages/07-ausbau.md) | Ausbau (optional) | OLED, Poti, Web-UI |
+| [Anhang](stages/anhang-wokwi.md) | Wokwi-Simulator | ESP32-Sketches ohne Hardware testen |
 
 **Roter Faden:** Stufe 3 zeigt, dass der Mikrocontroller Luxus ist, keine Notwendigkeit. Danach wird er schrittweise hinzugenommen — erst als Beobachter (Stufe 5), dann als Steuerung (Stufe 6).
 
@@ -49,6 +50,7 @@ Der klassische NE555 wird in einem Kurz-Exkurs erwähnt (Unterschiede beim Lesen
 - ESP32-DevKit V1 oder vergleichbares Board
 - Standard-Breadboard + Steckbrückenkabel
 - Multimeter (Pflicht), Oszilloskop / Logic-Analyzer (optional, nice-to-have)
+- **Optional: Wokwi-Simulator** als Software-Ersatz fürs Breadboard — Setup in [stages/anhang-wokwi.md](stages/anhang-wokwi.md). Jeder Sketch in `code/stageXX_*/` bringt bereits passende `diagram.json` + `wokwi.toml` mit.
 
 ## Stückliste
 
@@ -60,14 +62,23 @@ Siehe [parts-list.md](parts-list.md).
 ESP32-NE555-Tutorial/
 ├── README.md                 ← dieses Dokument
 ├── parts-list.md             ← Stückliste
-└── stages/                   ← eine Datei pro Stufe
-    ├── 00-grundlagen.md
-    ├── 01-astabil.md
-    ├── ...
-    └── 07-ausbau.md
+├── stages/                   ← eine Datei pro Stufe + Anhang
+│   ├── 00-grundlagen.md
+│   ├── ...
+│   ├── 07-ausbau.md
+│   └── anhang-wokwi.md
+├── code/                     ← Arduino-Sketches ab Stufe 4 (je Sketch ein Ordner mit
+│                                .ino, diagram.json, wokwi.toml)
+└── assets/                   ← Bilder, nach Stufen gegliedert
+    ├── stage-04/
+    │   ├── wokwi-blink.jpg
+    │   └── wokwi-button.jpg
+    ├── stage-05/
+    ├── stage-06/
+    └── stage-07/
 ```
 
-Schaltpläne, Code und Fotos kommen später in eigene Unterordner (`schematics/`, `code/`, `assets/`), sobald wir sie erzeugen.
+Präfix `wokwi-` in den Bildnamen reserviert Platz für spätere `aufbau-*.jpg` (echte Hardware-Fotos) und `falstad-*.png` (Schaltungssimulationen für die Stufen 0–3).
 
 ## Wie du dieses Tutorial liest
 
@@ -79,4 +90,4 @@ Schaltpläne, Code und Fotos kommen später in eigene Unterordner (`schematics/`
 
 ### Hinweis zu Fotos und Schaltplänen
 
-Das Repository enthält aktuell nur Text-Beschreibungen, Pin-Tabellen und ASCII-Skizzen. **Echte Schaltpläne und Aufbau-Fotos folgen**, sobald die Stufen in der Werkstatt wirklich aufgebaut wurden — solche Bilder sind der letzte Schritt, nicht der erste.
+Ab Stufe 4 liegen in `assets/stage-0X/` **Wokwi-Screenshots** der fertigen Simulationen. **Echte Aufbau-Fotos** für die Hardware-Stufen 0–3 und -3 folgen, sobald die Stufen in der Werkstatt aufgebaut werden — echte Bilder sind der letzte Schritt, nicht der erste.
